@@ -68,7 +68,9 @@
             $("#btnSave").click(function () {
                 var student = {};
                 student.studentName = $("#StudentName").val();
-                student.studentAddress = $("#StudentName").val();
+                student.studentAddress = $("#StudentAddress").val();
+                student.studentCode = $("#StudentCode").val();
+                student.studentLastName = $("#StudentLastName").val();
                 $.ajax({
                     type: "POST",
                     url: '@Url.Action("createStudent")',

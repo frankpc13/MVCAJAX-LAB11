@@ -22,6 +22,19 @@ namespace Service
             return students;
         }
 
+
+        public List<Student> Search(string query)
+        {
+            List<Student> students = null;
+
+            using(var context = new SchoolContext())
+            {
+                students = context.Students.Where(x => x.studentName.ToLower().Contains(query.ToLower()) || x.studentLastName.ToLower().Contains(query.ToLower())).ToList();
+            }
+
+            return students;
+        }
+
         public Student GetById(int ID)
         {
             Student student = null;
@@ -65,5 +78,6 @@ namespace Service
                 context.SaveChanges();
             }
         }
+
     }
 }

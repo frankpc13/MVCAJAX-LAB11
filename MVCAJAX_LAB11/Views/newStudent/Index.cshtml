@@ -1,0 +1,206 @@
+﻿@model List<MVCAJAX_LAB11.Models.StudentModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" style="margin-top:32px; margin-bottom:32px">
+    <div class="col-lg-3">
+        <div class="input-group">
+            <input id="inputSearch" name="inputSearch" type="text" class="form-control" placeholder="Search for...">
+            <span class="input-group-btn">
+                <button id="searchButton" class="btn btn-default" type="button">Go!</button>
+            </span>
+        </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+<table id="tableStudent" class="table table-bordered table-striped table-responsive table-hover">
+    <thead>
+        <tr>
+            <th align="left" class="productth">ID</th>
+            <th align="left" class="productth">Student Name</th>
+            <th align="left" class="productth">Student Lastname</th>
+            <th align="left" class="productth">Student Address</th>
+            <th align="left" class="productth">Student Code</th>
+            <th align="left" class="productth">Edit</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.IsActive == true)
+            {
+                <tr>
+                    <td align="left" class="prtoducttd">@item.ID</td>
+                    <td align="left" class="prtoducttd">@item.Name</td>
+                    <td align="left" class="prtoducttd">@item.LastName</td>
+                    <td align="left" class="prtoducttd">@item.Address</td>
+                    <td align="left" class="prtoducttd">@item.Code</td>
+                    <td align="left" class="prtoducttd">
+                        <a class="btn btn-danger btnDelete">
+                            <i class="glyphicon glyphicon-erase"></i>
+                        </a>
+                        <a class="btn btn-warning btnEdit">
+                            <i class="glyphicon glyphicon-pencil"></i>
+                        </a>
+                    </td>
+
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<!-- The modal -->
+<div class="modal fade" id="flipFlop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="modalLabel">Modal Title</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Student Name:</label>
+                    <input class="form-control" type="text" id="inputName" placeholder="student name" />
+                </div>
+                <div class="form-group">
+                    <label>Student Last name:</label>
+                    <input class="form-control" type="text" id="inputLastName" placeholder="student lastname" />
+                </div>
+                <div class="form-group">
+                    <label>Student address:</label>
+                    <input class="form-control" type="text" id="inputAdress" placeholder="student address" />
+                </div>
+                <div class="form-group">
+                    <label>Student code:</label>
+                    <input class="form-control" type="text" id="inputCode" placeholder="student code" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            //LoadData();
+            $(".btnEdit").click(function () {
+                $("#flipFlop").modal('show');
+                var row = $(this).closest('tr').index();
+               console.log(row);
+               //console.log(Model[0]);
+                var array = [];
+                $("#tableStudent tr").find("td:first-child").each(function (data) {
+                   // console.log($(this).html())
+                    array.push($(this).html());
+                });
+                console.log(array);
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("getStudent")",
+                    data: JSON.stringify({ id: array[row] }),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (response) {
+                        console.log("gg");
+                        console.log(response);
+                    },
+                    error: function () {
+                        alert("No se encontro al estudiante");
+                    }
+                });
+                return false;
+            });
+
+            $("#searchButton").click(function () {
+                var studentParam = $("#inputSearch").val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("FilterByNameOrLastName")",
+                    data: JSON.stringify({ query: studentParam }),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (response) {
+                        $("#tableStudent tbody tr").remove();
+                        console.log(response);
+                        var items = '';
+                    $.each(response, function (i, item) {
+                        var rows = "<tr>"
+                            + "<td class='prtoducttd'>" + item.studentID + "</td>"
+                            + "<td class='prtoducttd'>" + item.studentName + "</td>"
+                            + "<td class='prtoducttd'>" + item.studentLastName + "</td>"
+                            + "<td class='prtoducttd'>" + item.studentAddress + "</td>"
+                            + "<td class='prtoducttd'>" + item.studentCode + "</td>"
+                            + "</tr>";
+                        $("#tableStudent tbody").append(rows);
+                    });
+                    },
+                    error: function () {
+                        alert("No se encontro al estudiante");
+                    }
+                });
+                return false;
+            });
+
+            $("#btnSave").click(function () {
+                var student = {};
+                student.studentName = $("#StudentName").val();
+                student.studentAddress = $("#StudentAddress").val();
+                student.studentCode = $("#StudentCode").val();
+                student.studentLastName = $("#StudentLastName").val();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("createStudent")',
+                    data: '{student: ' + JSON.stringify(student) + '}',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function () {
+                        LoadData();
+                    },
+                    error: function () {
+                        alert("Error while inserting data");
+                    }
+                });
+                return false;
+            });
+
+        });
+
+        function LoadData() {
+            $("#tableStudent tbody tr").remove();
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("getStudent")',
+                dataType: 'json',
+                data: { id: '' },
+                success: function (data) {
+                    var items = '';
+                    $.each(data, function (i, item) {
+                        var rows = "<tr>"
+                            + "<td class='prtoducttd'>" + item.studentID + "</td>"
+                            + "<td class='prtoducttd'>" + item.studentName + "</td>"
+                            + "<td class='prtoducttd'>" + item.studentLastName + "</td>"
+                            + "<td class='prtoducttd'>" + item.studentAddress + "</td>"
+                            + "<td class='prtoducttd'>" + item.studentCode + "</td>"
+                            + "</tr>";
+                        $("#tableStudent tbody").append(rows);
+                    });
+                },
+                error: function (ex) {
+                    var r = jQuery.parseJSON(response.responseText);
+                    alert("Message:" + r.Message);
+                    alert("StackTrace:" + r, StackTrace);
+                    alert("ExceptionType:" + r.ExceptionType);
+                }
+            });
+            return false;
+        }
+    </script>
+}
+

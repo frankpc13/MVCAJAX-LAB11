@@ -26,5 +26,7 @@ namespace MVCAJAX_LAB11.Models
 
         [Required]
         public string Address { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }
