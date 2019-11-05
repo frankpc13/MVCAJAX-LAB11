@@ -93,14 +93,14 @@
             $(".btnEdit").click(function () {
                 $("#flipFlop").modal('show');
                 var row = $(this).closest('tr').index();
-               console.log(row);
-               //console.log(Model[0]);
+               //console.log(row);
+                //console.log(Model[0]);
                 var array = [];
                 $("#tableStudent tr").find("td:first-child").each(function (data) {
                    // console.log($(this).html())
                     array.push($(this).html());
                 });
-                console.log(array);
+                console.log("la entidad id"+array[row]);
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("getStudent")",

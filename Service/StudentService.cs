@@ -40,7 +40,7 @@ namespace Service
             Student student = null;
              using (var context = new SchoolContext())
             {
-                context.Students.Find(ID);
+                student = context.Students.Find(ID);
             }
             return student;
         }

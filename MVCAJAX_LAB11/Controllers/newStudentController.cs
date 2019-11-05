@@ -39,7 +39,7 @@ namespace MVCAJAX_LAB11.Controllers
         [HttpPost]
         public JsonResult getStudent(string id)
         {
-            return Json(service.GetById(Convert.ToInt32(id)));
+            return Json(service.GetById(Convert.ToInt32(id)), JsonRequestBehavior.DenyGet);
         }
     }
 }
